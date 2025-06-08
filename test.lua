@@ -279,7 +279,6 @@ verifyButton.MouseButton1Click:Connect(function()
     if success then
         statusLabel.Text = "Key ถูกต้อง! ระบบทำงานแล้ว"
         print("hee")
-        frame.Visible = false
     else
         statusLabel.Text = "Key ไม่ถูกต้อง หรือหมดอายุ"
     end
