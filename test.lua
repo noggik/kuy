@@ -19,6 +19,7 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Player = Window:AddTab({ Title = "Player", Icon = "user" }),
+    Teleport = Window:AddTab({ Title = "Teleport", Icon = "map-pin" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
@@ -227,6 +228,16 @@ do
     SaveManager:BuildConfigSection(Tabs.Settings)
 end
 
+Tabs.Teleport:AddButton({
+    Title = "เหมือง",
+    Description = "กดเพื่อเวาปไปเหมือง",
+    Callback = function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1882.3053, 6.75000668, -185.973892)
+        end
+    end
+})
+
 Window:SelectTab(1)
 
 createToggleButton()
@@ -235,7 +246,7 @@ Fluent:Notify({
     Title = "Kanye",
     Content = "สคริปต์โหลดสำเร็จแล้ว!",
     SubContent = "By xin",
-    Duration = 4
+    Duration = 5
 })
 
 SaveManager:LoadAutoloadConfig()
