@@ -37,15 +37,15 @@ local function createToggleButton()
     ToggleButton.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
     ToggleButton.BorderSizePixel = 0
     ToggleButton.Position = UDim2.new(0, 20, 0, 20)
-    ToggleButton.Size = UDim2.new(0, 60, 0, 60)
+    ToggleButton.Size = UDim2.new(0, 20, 0, 20)
     ToggleButton.Font = Enum.Font.GothamBold
-    ToggleButton.Text = "UI"
+    ToggleButton.Text = "Xin"
     ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     ToggleButton.TextScaled = true
     ToggleButton.ZIndex = 1000
 
     local Corner = Instance.new("UICorner")
-    Corner.CornerRadius = UDim.new(0, 12)
+    Corner.CornerRadius = UDim.new(0, 4)
     Corner.Parent = ToggleButton
 
     local Gradient = Instance.new("UIGradient")
@@ -59,20 +59,9 @@ local function createToggleButton()
 
     local Stroke = Instance.new("UIStroke")
     Stroke.Color = Color3.fromRGB(255, 255, 255)
-    Stroke.Thickness = 2
+    Stroke.Thickness = 1
     Stroke.Transparency = 0.7
     Stroke.Parent = ToggleButton
-
-    local Shadow = Instance.new("ImageLabel")
-    Shadow.Name = "Shadow"
-    Shadow.Parent = ToggleButton
-    Shadow.BackgroundTransparency = 1
-    Shadow.Position = UDim2.new(0, -15, 0, -15)
-    Shadow.Size = UDim2.new(1, 30, 1, 30)
-    Shadow.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
-    Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-    Shadow.ImageTransparency = 0.8
-    Shadow.ZIndex = ToggleButton.ZIndex - 1
 
     local isUIVisible = true
 
@@ -87,12 +76,12 @@ local function createToggleButton()
         
         local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         local tween = TweenService:Create(ToggleButton, tweenInfo, {
-            Size = UDim2.new(0, 55, 0, 55)
+            Size = UDim2.new(0, 18, 0, 18)
         })
         tween:Play()
         tween.Completed:Connect(function()
             local tween2 = TweenService:Create(ToggleButton, tweenInfo, {
-                Size = UDim2.new(0, 60, 0, 60)
+                Size = UDim2.new(0, 20, 0, 20)
             })
             tween2:Play()
         end)
@@ -146,7 +135,7 @@ local function createToggleButton()
     ToggleButton.MouseEnter:Connect(function()
         local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         TweenService:Create(ToggleButton, tweenInfo, {
-            Size = UDim2.new(0, 65, 0, 65)
+            Size = UDim2.new(0, 22, 0, 22)
         }):Play()
         TweenService:Create(Stroke, tweenInfo, {
             Transparency = 0.3
@@ -156,7 +145,7 @@ local function createToggleButton()
     ToggleButton.MouseLeave:Connect(function()
         local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         TweenService:Create(ToggleButton, tweenInfo, {
-            Size = UDim2.new(0, 60, 0, 60)
+            Size = UDim2.new(0, 20, 0, 20)
         }):Play()
         TweenService:Create(Stroke, tweenInfo, {
             Transparency = 0.7
@@ -243,9 +232,9 @@ Window:SelectTab(1)
 createToggleButton()
 
 Fluent:Notify({
-    Title = "Player Control",
+    Title = "Kanye",
     Content = "สคริปต์โหลดสำเร็จแล้ว!",
-    SubContent = "ใช้แท็บ Player เพื่อปรับความไวตัวละคร",
+    SubContent = "By xin",
     Duration = 5
 })
 
