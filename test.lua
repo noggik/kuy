@@ -27,14 +27,15 @@ local Tabs = {
 
 local Options = Fluent.Options
 local selectedESPItems = {}
+local pendingESPItems = {}
 
-local function getUniqueMeshPartNames()
+local function getUniqueObjectNames()
     local names = {}
     local uniqueNames = {}
     
     if workspace:FindFirstChild("SpawnedBlocks") then
         for _, obj in pairs(workspace.SpawnedBlocks:GetChildren()) do
-            if obj:IsA("MeshPart") and not names[obj.Name] then
+            if not names[obj.Name] then
                 names[obj.Name] = true
                 table.insert(uniqueNames, obj.Name)
             end
@@ -44,50 +45,56 @@ local function getUniqueMeshPartNames()
     return uniqueNames
 end
 
-local function applyESP(meshPart, enable)
+local function applyESP(object, enable)
     if enable then
-        if not meshPart:FindFirstChild("ESPHighlight") then
+        if not object:FindFirstChild("ESPHighlight") then
             local highlight = Instance.new("Highlight")
             highlight.Name = "ESPHighlight"
             highlight.FillColor = Color3.fromRGB(255, 0, 0)
             highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
             highlight.FillTransparency = 0.3
             highlight.OutlineTransparency = 0
-            highlight.Parent = meshPart
+            highlight.Parent = object
         end
         
-        local billboardGui = Instance.new("BillboardGui")
-        billboardGui.Name = "ESPLabel"
-        billboardGui.Size = UDim2.new(0, 100, 0, 50)
-        billboardGui.StudsOffset = Vector3.new(0, 2, 0)
-        billboardGui.Parent = meshPart
+        if not object:FindFirstChild("ESPLabel") then
+            local billboardGui = Instance.new("BillboardGui")
+            billboardGui.Name = "ESPLabel"
+            billboardGui.Size = UDim2.new(0, 100, 0, 50)
+            billboardGui.StudsOffset = Vector3.new(0, 2, 0)
+            billboardGui.Parent = object
+            
+            local textLabel = Instance.new("TextLabel")
+            textLabel.Size = UDim2.new(1, 0, 1, 0)
+            textLabel.BackgroundTransparency = 1
+            textLabel.Text = object.Name
+            textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            textLabel.TextScaled = true
+            textLabel.Font = Enum.Font.GothamBold
+            textLabel.TextStrokeTransparency = 0
+            textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+            textLabel.Parent = billboardGui
+        end
         
-        local textLabel = Instance.new("TextLabel")
-        textLabel.Size = UDim2.new(1, 0, 1, 0)
-        textLabel.BackgroundTransparency = 1
-        textLabel.Text = meshPart.Name
-        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        textLabel.TextScaled = true
-        textLabel.Font = Enum.Font.GothamBold
-        textLabel.TextStrokeTransparency = 0
-        textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-        textLabel.Parent = billboardGui
-        
-        meshPart.CanCollide = false
-        meshPart.Transparency = 0.5
+        if object:IsA("BasePart") then
+            object.CanCollide = false
+            object.Transparency = 0.5
+        end
     else
-        local highlight = meshPart:FindFirstChild("ESPHighlight")
+        local highlight = object:FindFirstChild("ESPHighlight")
         if highlight then
             highlight:Destroy()
         end
         
-        local label = meshPart:FindFirstChild("ESPLabel")
+        local label = object:FindFirstChild("ESPLabel")
         if label then
             label:Destroy()
         end
         
-        meshPart.CanCollide = true
-        meshPart.Transparency = 0
+        if object:IsA("BasePart") then
+            object.CanCollide = true
+            object.Transparency = 0
+        end
     end
 end
 
@@ -96,10 +103,8 @@ local function updateESP(selectedItems)
     
     if workspace:FindFirstChild("SpawnedBlocks") then
         for _, obj in pairs(workspace.SpawnedBlocks:GetChildren()) do
-            if obj:IsA("MeshPart") then
-                local isSelected = selectedESPItems[obj.Name] == true
-                applyESP(obj, isSelected)
-            end
+            local isSelected = selectedESPItems[obj.Name] == true
+            applyESP(obj, isSelected)
         end
     end
 end
@@ -107,7 +112,7 @@ end
 local function monitorNewBlocks()
     if workspace:FindFirstChild("SpawnedBlocks") then
         workspace.SpawnedBlocks.ChildAdded:Connect(function(child)
-            if child:IsA("MeshPart") and selectedESPItems[child.Name] then
+            if selectedESPItems[child.Name] then
                 wait(0.1)
                 applyESP(child, true)
             end
@@ -116,30 +121,43 @@ local function monitorNewBlocks()
 end
 
 do
-    local meshPartNames = getUniqueMeshPartNames()
+    local objectNames = getUniqueObjectNames()
     
     local ESPDropdown = Tabs["Esp ore"]:AddDropdown("ESPDropdown", {
-        Title = "ESP MeshParts",
-        Description = "เลือก MeshParts ที่ต้องการ ESP",
-        Values = meshPartNames,
+        Title = "เลือก Objects",
+        Description = "เลือก Objects ที่ต้องการ ESP",
+        Values = objectNames,
         Multi = true,
         Default = {},
     })
 
     ESPDropdown:OnChanged(function(Value)
-        updateESP(Value)
-        print("ESP Updated for:", Value)
+        pendingESPItems = Value
+        print("เลือก Objects:", Value)
     end)
 
     Tabs["Esp ore"]:AddButton({
-        Title = "รีเฟรช MeshParts",
-        Description = "อัพเดทรายการ MeshParts",
+        Title = "ยืนยัน ESP",
+        Description = "กดเพื่อยืนยันและเปิด ESP",
         Callback = function()
-            local newNames = getUniqueMeshPartNames()
+            updateESP(pendingESPItems)
+            Fluent:Notify({
+                Title = "ESP เปิดแล้ว",
+                Content = "ESP ถูกเปิดสำหรับ Objects ที่เลือก",
+                Duration = 3
+            })
+        end
+    })
+
+    Tabs["Esp ore"]:AddButton({
+        Title = "รีเฟรช Objects",
+        Description = "อัพเดทรายการ Objects",
+        Callback = function()
+            local newNames = getUniqueObjectNames()
             ESPDropdown:SetValues(newNames)
             Fluent:Notify({
                 Title = "อัพเดทสำเร็จ",
-                Content = "รายการ MeshParts ถูกอัพเดทแล้ว",
+                Content = "รายการ Objects ถูกอัพเดทแล้ว",
                 Duration = 3
             })
         end
@@ -147,9 +165,10 @@ do
     
     Tabs["Esp ore"]:AddButton({
         Title = "ปิด ESP ทั้งหมด",
-        Description = "ปิด ESP ของ MeshParts ทั้งหมด",
+        Description = "ปิด ESP ของ Objects ทั้งหมด",
         Callback = function()
             selectedESPItems = {}
+            pendingESPItems = {}
             updateESP({})
             ESPDropdown:SetValue({})
             Fluent:Notify({
