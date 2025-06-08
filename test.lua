@@ -8,8 +8,8 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
 local Window = Fluent:CreateWindow({
-    Title = "Mining tycoon" .. Fluent.Version,
-    SubTitle = "Creat by Xin",
+    Title = "Mining tycoon " .. Fluent.Version,
+    SubTitle = "Created by Xin",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
@@ -20,7 +20,7 @@ local Window = Fluent:CreateWindow({
 local Tabs = {
     Player = Window:AddTab({ Title = "Player", Icon = "user" }),
     Teleport = Window:AddTab({ Title = "Teleport", Icon = "map-pin" }),
-    Esp ore = Window:AddTab({ Title = "Esp", Icon = "atom" }),
+    ["Esp ore"] = Window:AddTab({ Title = "Esp", Icon = "atom" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
@@ -296,14 +296,10 @@ end
 do
     SaveManager:SetLibrary(Fluent)
     InterfaceManager:SetLibrary(Fluent)
-
     SaveManager:IgnoreThemeSettings()
-
     SaveManager:SetIgnoreIndexes({})
-
     InterfaceManager:SetFolder("PlayerControlScript")
     SaveManager:SetFolder("PlayerControlScript/configs")
-
     InterfaceManager:BuildInterfaceSection(Tabs.Settings)
     SaveManager:BuildConfigSection(Tabs.Settings)
 end
@@ -319,7 +315,6 @@ Tabs.Teleport:AddButton({
 })
 
 Window:SelectTab(1)
-
 createToggleButton()
 
 Fluent:Notify({
@@ -328,7 +323,5 @@ Fluent:Notify({
     SubContent = "By xin",
     Duration = 5
 })
-
-
 
 SaveManager:LoadAutoloadConfig()
