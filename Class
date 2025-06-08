@@ -1,10 +1,10 @@
-// npm install discord.js dayjs
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const dayjs = require('dayjs');
-require('dayjs/locale/th');
-dayjs.locale('th');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
-// ตารางเรียน (ตรงตามภาพ)
 const timetable = {
   'จันทร์': [
     { start: '07:30', end: '08:20', subject: 'Home Room', code: '-', teacher: 'ครูจุฬาลักษณ์' },
@@ -76,7 +76,7 @@ const timetable = {
 const daysTH = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
 
 function getCurrentAndNextPeriod() {
-  const now = dayjs().locale('th');
+  const now = dayjs().tz('Asia/Bangkok');
   const day = daysTH[now.day()];
   if (!timetable[day]) {
     return { current: { subject: 'ไม่มีคาบเรียน', code: '-', teacher: '-' }, next: { subject: 'ไม่มีคาบเรียน', code: '-', teacher: '-' }, day, time: now.format('HH:mm') };
@@ -86,8 +86,8 @@ function getCurrentAndNextPeriod() {
   let next = { subject: 'ไม่มีคาบเรียน', code: '-', teacher: '-' };
   for (let i = 0; i < periods.length; i++) {
     const { start, end } = periods[i];
-    const startTime = dayjs(now.format('YYYY-MM-DD') + ' ' + start);
-    const endTime = dayjs(now.format('YYYY-MM-DD') + ' ' + end);
+    const startTime = dayjs.tz(now.format('YYYY-MM-DD') + ' ' + start, 'YYYY-MM-DD HH:mm', 'Asia/Bangkok');
+    const endTime = dayjs.tz(now.format('YYYY-MM-DD') + ' ' + end, 'YYYY-MM-DD HH:mm', 'Asia/Bangkok');
     if (now.isAfter(startTime) && now.isBefore(endTime)) {
       current = periods[i];
       next = periods[i+1] || { subject: 'ไม่มีคาบเรียน', code: '-', teacher: '-' };
@@ -100,7 +100,7 @@ function getCurrentAndNextPeriod() {
     }
   }
   // หลัง 16:40
-  if (now.isAfter(dayjs(now.format('YYYY-MM-DD') + ' 16:40'))) {
+  if (now.isAfter(dayjs.tz(now.format('YYYY-MM-DD') + ' 16:40', 'YYYY-MM-DD HH:mm', 'Asia/Bangkok'))) {
     current = { subject: 'ไม่มีคาบเรียน', code: '-', teacher: '-' };
     next = { subject: 'ไม่มีคาบเรียน', code: '-', teacher: '-' };
   }
@@ -125,7 +125,7 @@ client.on('messageCreate', async message => {
           { name: 'คาบปัจจุบัน', value: `**${current.subject}**\nรหัส: ${current.code}\nครู: ${current.teacher}`, inline: true },
           { name: 'คาบถัดไป', value: `**${next.subject}**\nรหัส: ${next.code}\nครู: ${next.teacher}`, inline: true },
         )
-        .setFooter({ text: 'อัปเดตทุก 30 วินาที' })
+        .setFooter({ text: 'อัปเดตทุก 30 วินาที (เวลาประเทศไทย)' })
         .setTimestamp();
 
       if (lastMessage) {
