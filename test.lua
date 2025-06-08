@@ -225,7 +225,7 @@ frame.Position = UDim2.new(0.5, -175, 0.5, -85)
 frame.BackgroundColor3 = Color3.fromRGB(40,40,40)
 frame.BorderSizePixel = 0
 frame.Parent = screenGui
-local keyBox = Instance.new("TextBox")
+local keyBox = Instance.new("ใส่คีย์")
 keyBox.Name = "KeyBox"
 keyBox.PlaceholderText = "กรอกคีย์ที่นี่"
 keyBox.Size = UDim2.new(0, 210, 0, 35)
@@ -237,7 +237,7 @@ keyBox.TextSize = 20
 keyBox.Parent = frame
 local copyButton = Instance.new("TextButton")
 copyButton.Name = "CopyButton"
-copyButton.Text = "Copy Link"
+copyButton.Text = "คัดลอกลิ้ง"
 copyButton.Size = UDim2.new(0, 100, 0, 35)
 copyButton.Position = UDim2.new(0, 240, 0, 20)
 copyButton.BackgroundColor3 = Color3.fromRGB(80,160,80)
@@ -247,7 +247,7 @@ copyButton.TextSize = 18
 copyButton.Parent = frame
 local verifyButton = Instance.new("TextButton")
 verifyButton.Name = "VerifyButton"
-verifyButton.Text = "Verify Key"
+verifyButton.Text = "ยืนยันคีย์"
 verifyButton.Size = UDim2.new(0, 320, 0, 35)
 verifyButton.Position = UDim2.new(0, 15, 0, 65)
 verifyButton.BackgroundColor3 = Color3.fromRGB(80,80,160)
@@ -271,15 +271,16 @@ onMessage = function(message)
 end
 copyButton.MouseButton1Click:Connect(function()
     copyLink()
-    statusLabel.Text = "ลิงก์ถูกคัดลอกแล้ว! ไปวางในเบราว์เซอร์เพื่อรับคีย์"
+    statusLabel.Text = "นำลิ้งไปวางใน Google"
 end)
 verifyButton.MouseButton1Click:Connect(function()
     local key = keyBox.Text
     local success = verifyKey(key)
     if success then
-        statusLabel.Text = "Key ถูกต้อง! ระบบทำงานแล้ว"
+        statusLabel.Text = "Key ถูกต้อง รอสคริปโหลดแปปนึงไอสัส"
         print("hee")
+        frame.Visible = false
     else
-        statusLabel.Text = "Key ไม่ถูกต้อง หรือหมดอายุ"
+        statusLabel.Text = "Key ไม่ถูกต้องไอสัส"
     end
 end)
