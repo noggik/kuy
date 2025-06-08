@@ -235,7 +235,7 @@ Fluent:Notify({
     Title = "Kanye",
     Content = "สคริปต์โหลดสำเร็จแล้ว!",
     SubContent = "By xin",
-    Duration = 5
+    Duration = 4
 })
 
 SaveManager:LoadAutoloadConfig()
