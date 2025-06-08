@@ -250,7 +250,6 @@ Fluent:Notify({
     Duration = 5
 })
 
-do
     local espObjects = {}
     
     local function createESP(meshPart)
