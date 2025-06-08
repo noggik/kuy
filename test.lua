@@ -54,15 +54,28 @@ local function applyESP(object, enable)
             highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
             highlight.FillTransparency = 0.3
             highlight.OutlineTransparency = 0
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
             highlight.Parent = object
+        end
+        
+        if not object:FindFirstChild("ESPBox") then
+            local selectionBox = Instance.new("SelectionBox")
+            selectionBox.Name = "ESPBox"
+            selectionBox.Color3 = Color3.fromRGB(255, 0, 0)
+            selectionBox.LineThickness = 0.2
+            selectionBox.Transparency = 0.3
+            selectionBox.Adornee = object
+            selectionBox.Parent = object
         end
         
         if not object:FindFirstChild("ESPLabel") then
             local billboardGui = Instance.new("BillboardGui")
             billboardGui.Name = "ESPLabel"
-            billboardGui.Size = UDim2.new(0, 100, 0, 50)
-            billboardGui.StudsOffset = Vector3.new(0, 2, 0)
-            billboardGui.Parent = object
+            billboardGui.Size = UDim2.new(0, 200, 0, 50)
+            billboardGui.StudsOffset = Vector3.new(0, 3, 0)
+            billboardGui.Adornee = object
+            billboardGui.AlwaysOnTop = true
+            billboardGui.Parent = workspace
             
             local textLabel = Instance.new("TextLabel")
             textLabel.Size = UDim2.new(1, 0, 1, 0)
@@ -78,7 +91,8 @@ local function applyESP(object, enable)
         
         if object:IsA("BasePart") then
             object.CanCollide = false
-            object.Transparency = 0.5
+            object.Material = Enum.Material.ForceField
+            object.BrickColor = BrickColor.new("Bright red")
         end
     else
         local highlight = object:FindFirstChild("ESPHighlight")
@@ -86,14 +100,21 @@ local function applyESP(object, enable)
             highlight:Destroy()
         end
         
-        local label = object:FindFirstChild("ESPLabel")
-        if label then
-            label:Destroy()
+        local box = object:FindFirstChild("ESPBox")
+        if box then
+            box:Destroy()
+        end
+        
+        for _, gui in pairs(workspace:GetChildren()) do
+            if gui:IsA("BillboardGui") and gui.Name == "ESPLabel" and gui.Adornee == object then
+                gui:Destroy()
+            end
         end
         
         if object:IsA("BasePart") then
             object.CanCollide = true
-            object.Transparency = 0
+            object.Material = Enum.Material.Plastic
+            object.BrickColor = BrickColor.new("Medium stone grey")
         end
     end
 end
