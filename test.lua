@@ -26,6 +26,85 @@ local Tabs = {
 
 local Options = Fluent.Options
 
+local function getUniqueMeshPartNames()
+    local names = {}
+    local uniqueNames = {}
+    
+    if workspace:FindFirstChild("SpawnedBlocks") then
+        for _, obj in pairs(workspace.SpawnedBlocks:GetChildren()) do
+            if obj:IsA("MeshPart") and not names[obj.Name] then
+                names[obj.Name] = true
+                table.insert(uniqueNames, obj.Name)
+            end
+        end
+    end
+    
+    return uniqueNames
+end
+
+local function applyESP(meshPart, enable)
+    if enable then
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "ESPHighlight"
+        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.FillTransparency = 0.5
+        highlight.OutlineTransparency = 0
+        highlight.Parent = meshPart
+        
+        meshPart.CanCollide = false
+        meshPart.Transparency = 0.3
+    else
+        local highlight = meshPart:FindFirstChild("ESPHighlight")
+        if highlight then
+            highlight:Destroy()
+        end
+        meshPart.CanCollide = true
+        meshPart.Transparency = 0
+    end
+end
+
+local function updateESP(selectedItems)
+    if workspace:FindFirstChild("SpawnedBlocks") then
+        for _, obj in pairs(workspace.SpawnedBlocks:GetChildren()) do
+            if obj:IsA("MeshPart") then
+                local isSelected = selectedItems[obj.Name] == true
+                applyESP(obj, isSelected)
+            end
+        end
+    end
+end
+
+do
+    local meshPartNames = getUniqueMeshPartNames()
+    
+    local ESPDropdown = Tabs["Esp ore"]:AddDropdown("ESPDropdown", {
+        Title = "ESP MeshParts",
+        Description = "เลือก MeshParts ที่ต้องการ ESP",
+        Values = meshPartNames,
+        Multi = true,
+        Default = {},
+    })
+
+    ESPDropdown:OnChanged(function(Value)
+        updateESP(Value)
+    end)
+
+    Tabs["Esp ore"]:AddButton({
+        Title = "รีเฟรช MeshParts",
+        Description = "อัพเดทรายการ MeshParts",
+        Callback = function()
+            local newNames = getUniqueMeshPartNames()
+            ESPDropdown:SetValues(newNames)
+            Fluent:Notify({
+                Title = "อัพเดทสำเร็จ",
+                Content = "รายการ MeshParts ถูกอัพเดทแล้ว",
+                Duration = 3
+            })
+        end
+    })
+end
+
 local function createToggleButton()
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "UIToggleButton"
@@ -250,68 +329,6 @@ Fluent:Notify({
     Duration = 5
 })
 
-    local espObjects = {}
-    
-    local function createESP(meshPart)
-        local billboardGui = Instance.new("BillboardGui")
-        billboardGui.Parent = meshPart
-        billboardGui.Size = UDim2.new(0, 200, 0, 50)
-        billboardGui.StudsOffset = Vector3.new(0, 2, 0)
-        billboardGui.AlwaysOnTop = true
-        
-        local textLabel = Instance.new("TextLabel")
-        textLabel.Parent = billboardGui
-        textLabel.Size = UDim2.new(1, 0, 1, 0)
-        textLabel.BackgroundTransparency = 0.3
-        textLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        textLabel.TextScaled = true
-        textLabel.Font = Enum.Font.GothamBold
-        textLabel.Text = meshPart.Name
-        
-        espObjects[meshPart] = billboardGui
-    end
-    
-    local function removeESP(meshPart)
-        if espObjects[meshPart] then
-            espObjects[meshPart]:Destroy()
-            espObjects[meshPart] = nil
-        end
-    end
-    
-    local function getUniqueNames()
-        local uniqueNames = {}
-        if workspace:FindFirstChild("SpawnedBlocks") then
-            for _, obj in pairs(workspace.SpawnedBlocks:GetChildren()) do
-                if obj:IsA("MeshPart") and not table.find(uniqueNames, obj.Name) then
-                    table.insert(uniqueNames, obj.Name)
-                end
-            end
-        end
-        return uniqueNames
-    end
-    
-    local EspDropdown = Tabs["Esp ore"]:AddDropdown("EspDropdown", {
-        Title = "ESP แร่",
-        Description = "เลือกแร่ที่ต้องการแสดง ESP",
-        Values = getUniqueNames(),
-        Multi = true,
-        Default = {},
-    })
-    
-    EspDropdown:OnChanged(function(Value)
-        for meshPart, _ in pairs(espObjects) do
-            removeESP(meshPart)
-        end
-        
-        if workspace:FindFirstChild("SpawnedBlocks") then
-            for _, obj in pairs(workspace.SpawnedBlocks:GetChildren()) do
-                if obj:IsA("MeshPart") and Value[obj.Name] then
-                    createESP(obj)
-                end
-            end
-        end
-    end)
-end
+
 
 SaveManager:LoadAutoloadConfig()
