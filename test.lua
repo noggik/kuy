@@ -284,5 +284,3 @@ verifyButton.MouseButton1Click:Connect(function()
         statusLabel.Text = "Key ไม่ถูกต้อง หรือหมดอายุ"
     end
 end)
-  end
-end)
