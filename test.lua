@@ -20,6 +20,7 @@ local Window = Fluent:CreateWindow({
 local Tabs = {
     Player = Window:AddTab({ Title = "Player", Icon = "user" }),
     Teleport = Window:AddTab({ Title = "Teleport", Icon = "map-pin" }),
+    Esp ore = Window:AddTab({ Title = "Esp", Icon = "atom" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
@@ -248,5 +249,70 @@ Fluent:Notify({
     SubContent = "By xin",
     Duration = 5
 })
+
+do
+    local espObjects = {}
+    
+    local function createESP(meshPart)
+        local billboardGui = Instance.new("BillboardGui")
+        billboardGui.Parent = meshPart
+        billboardGui.Size = UDim2.new(0, 200, 0, 50)
+        billboardGui.StudsOffset = Vector3.new(0, 2, 0)
+        billboardGui.AlwaysOnTop = true
+        
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Parent = billboardGui
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 0.3
+        textLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textLabel.TextScaled = true
+        textLabel.Font = Enum.Font.GothamBold
+        textLabel.Text = meshPart.Name
+        
+        espObjects[meshPart] = billboardGui
+    end
+    
+    local function removeESP(meshPart)
+        if espObjects[meshPart] then
+            espObjects[meshPart]:Destroy()
+            espObjects[meshPart] = nil
+        end
+    end
+    
+    local function getUniqueNames()
+        local uniqueNames = {}
+        if workspace:FindFirstChild("SpawnedBlocks") then
+            for _, obj in pairs(workspace.SpawnedBlocks:GetChildren()) do
+                if obj:IsA("MeshPart") and not table.find(uniqueNames, obj.Name) then
+                    table.insert(uniqueNames, obj.Name)
+                end
+            end
+        end
+        return uniqueNames
+    end
+    
+    local EspDropdown = Tabs["Esp ore"]:AddDropdown("EspDropdown", {
+        Title = "ESP แร่",
+        Description = "เลือกแร่ที่ต้องการแสดง ESP",
+        Values = getUniqueNames(),
+        Multi = true,
+        Default = {},
+    })
+    
+    EspDropdown:OnChanged(function(Value)
+        for meshPart, _ in pairs(espObjects) do
+            removeESP(meshPart)
+        end
+        
+        if workspace:FindFirstChild("SpawnedBlocks") then
+            for _, obj in pairs(workspace.SpawnedBlocks:GetChildren()) do
+                if obj:IsA("MeshPart") and Value[obj.Name] then
+                    createESP(obj)
+                end
+            end
+        end
+    end)
+end
 
 SaveManager:LoadAutoloadConfig()
