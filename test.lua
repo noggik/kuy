@@ -4,6 +4,8 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
 local Window = Fluent:CreateWindow({
     Title = "Mining tycoon" .. Fluent.Version,
@@ -21,6 +23,146 @@ local Tabs = {
 }
 
 local Options = Fluent.Options
+
+local function createToggleButton()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "UIToggleButton"
+    ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+    local ToggleButton = Instance.new("TextButton")
+    ToggleButton.Name = "ToggleButton"
+    ToggleButton.Parent = ScreenGui
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(75, 0, 130)
+    ToggleButton.BorderSizePixel = 0
+    ToggleButton.Position = UDim2.new(0, 20, 0, 20)
+    ToggleButton.Size = UDim2.new(0, 60, 0, 60)
+    ToggleButton.Font = Enum.Font.GothamBold
+    ToggleButton.Text = "UI"
+    ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleButton.TextScaled = true
+    ToggleButton.ZIndex = 1000
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 12)
+    Corner.Parent = ToggleButton
+
+    local Gradient = Instance.new("UIGradient")
+    Gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0.0, Color3.fromRGB(75, 0, 130)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(139, 0, 139)),
+        ColorSequenceKeypoint.new(1.0, Color3.fromRGB(220, 20, 60))
+    }
+    Gradient.Rotation = 45
+    Gradient.Parent = ToggleButton
+
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = Color3.fromRGB(255, 255, 255)
+    Stroke.Thickness = 2
+    Stroke.Transparency = 0.7
+    Stroke.Parent = ToggleButton
+
+    local Shadow = Instance.new("ImageLabel")
+    Shadow.Name = "Shadow"
+    Shadow.Parent = ToggleButton
+    Shadow.BackgroundTransparency = 1
+    Shadow.Position = UDim2.new(0, -15, 0, -15)
+    Shadow.Size = UDim2.new(1, 30, 1, 30)
+    Shadow.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
+    Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    Shadow.ImageTransparency = 0.8
+    Shadow.ZIndex = ToggleButton.ZIndex - 1
+
+    local isUIVisible = true
+
+    ToggleButton.MouseButton1Click:Connect(function()
+        isUIVisible = not isUIVisible
+        if isUIVisible then
+            Window:Minimize()
+            Window:Restore()
+        else
+            Window:Minimize()
+        end
+        
+        local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local tween = TweenService:Create(ToggleButton, tweenInfo, {
+            Size = UDim2.new(0, 55, 0, 55)
+        })
+        tween:Play()
+        tween.Completed:Connect(function()
+            local tween2 = TweenService:Create(ToggleButton, tweenInfo, {
+                Size = UDim2.new(0, 60, 0, 60)
+            })
+            tween2:Play()
+        end)
+    end)
+
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+
+    local function updateInput(input)
+        local delta = input.Position - dragStart
+        ToggleButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
+    ToggleButton.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = ToggleButton.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    ToggleButton.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            if dragging then
+                updateInput(input)
+            end
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            if dragging then
+                updateInput(input)
+            end
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+
+    ToggleButton.MouseEnter:Connect(function()
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        TweenService:Create(ToggleButton, tweenInfo, {
+            Size = UDim2.new(0, 65, 0, 65)
+        }):Play()
+        TweenService:Create(Stroke, tweenInfo, {
+            Transparency = 0.3
+        }):Play()
+    end)
+
+    ToggleButton.MouseLeave:Connect(function()
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        TweenService:Create(ToggleButton, tweenInfo, {
+            Size = UDim2.new(0, 60, 0, 60)
+        }):Play()
+        TweenService:Create(Stroke, tweenInfo, {
+            Transparency = 0.7
+        }):Play()
+    end)
+end
 
 do
     Tabs.Player:AddParagraph({
@@ -97,6 +239,8 @@ do
 end
 
 Window:SelectTab(1)
+
+createToggleButton()
 
 Fluent:Notify({
     Title = "Player Control",
