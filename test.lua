@@ -6,6 +6,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 local Window = Fluent:CreateWindow({
     Title = "Mining tycoon " .. Fluent.Version,
@@ -25,6 +26,7 @@ local Tabs = {
 }
 
 local Options = Fluent.Options
+local selectedESPItems = {}
 
 local function getUniqueMeshPartNames()
     local names = {}
@@ -44,34 +46,72 @@ end
 
 local function applyESP(meshPart, enable)
     if enable then
-        local highlight = Instance.new("Highlight")
-        highlight.Name = "ESPHighlight"
-        highlight.FillColor = Color3.fromRGB(255, 0, 0)
-        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-        highlight.FillTransparency = 0.5
-        highlight.OutlineTransparency = 0
-        highlight.Parent = meshPart
+        if not meshPart:FindFirstChild("ESPHighlight") then
+            local highlight = Instance.new("Highlight")
+            highlight.Name = "ESPHighlight"
+            highlight.FillColor = Color3.fromRGB(255, 0, 0)
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+            highlight.FillTransparency = 0.3
+            highlight.OutlineTransparency = 0
+            highlight.Parent = meshPart
+        end
+        
+        local billboardGui = Instance.new("BillboardGui")
+        billboardGui.Name = "ESPLabel"
+        billboardGui.Size = UDim2.new(0, 100, 0, 50)
+        billboardGui.StudsOffset = Vector3.new(0, 2, 0)
+        billboardGui.Parent = meshPart
+        
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Text = meshPart.Name
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textLabel.TextScaled = true
+        textLabel.Font = Enum.Font.GothamBold
+        textLabel.TextStrokeTransparency = 0
+        textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+        textLabel.Parent = billboardGui
         
         meshPart.CanCollide = false
-        meshPart.Transparency = 0.3
+        meshPart.Transparency = 0.5
     else
         local highlight = meshPart:FindFirstChild("ESPHighlight")
         if highlight then
             highlight:Destroy()
         end
+        
+        local label = meshPart:FindFirstChild("ESPLabel")
+        if label then
+            label:Destroy()
+        end
+        
         meshPart.CanCollide = true
         meshPart.Transparency = 0
     end
 end
 
 local function updateESP(selectedItems)
+    selectedESPItems = selectedItems or {}
+    
     if workspace:FindFirstChild("SpawnedBlocks") then
         for _, obj in pairs(workspace.SpawnedBlocks:GetChildren()) do
             if obj:IsA("MeshPart") then
-                local isSelected = selectedItems[obj.Name] == true
+                local isSelected = selectedESPItems[obj.Name] == true
                 applyESP(obj, isSelected)
             end
         end
+    end
+end
+
+local function monitorNewBlocks()
+    if workspace:FindFirstChild("SpawnedBlocks") then
+        workspace.SpawnedBlocks.ChildAdded:Connect(function(child)
+            if child:IsA("MeshPart") and selectedESPItems[child.Name] then
+                wait(0.1)
+                applyESP(child, true)
+            end
+        end)
     end
 end
 
@@ -88,6 +128,7 @@ do
 
     ESPDropdown:OnChanged(function(Value)
         updateESP(Value)
+        print("ESP Updated for:", Value)
     end)
 
     Tabs["Esp ore"]:AddButton({
@@ -103,6 +144,23 @@ do
             })
         end
     })
+    
+    Tabs["Esp ore"]:AddButton({
+        Title = "ปิด ESP ทั้งหมด",
+        Description = "ปิด ESP ของ MeshParts ทั้งหมด",
+        Callback = function()
+            selectedESPItems = {}
+            updateESP({})
+            ESPDropdown:SetValue({})
+            Fluent:Notify({
+                Title = "ปิด ESP แล้ว",
+                Content = "ESP ทั้งหมดถูกปิดแล้ว",
+                Duration = 3
+            })
+        end
+    })
+    
+    monitorNewBlocks()
 end
 
 local function createToggleButton()
