@@ -13,7 +13,8 @@ local Window = Fluent:CreateWindow({
 })
 
 local Tabs = {
-    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" }),
+    Main = Window:AddTab({ Title = "Main", Icon = "" })
 }
 
 SaveManager:SetLibrary(Fluent)
