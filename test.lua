@@ -1,7 +1,7 @@
 local MacLib = loadstring(game:HttpGet("https://github.com/biggaboy212/Maclib/releases/latest/download/maclib.txt"))()
 local Window = MacLib:Window({
-	Title = "KUY",
-	Subtitle = "Maclip content",
+	Title = "Xin bro",
+	Subtitle = "ของฟรีไอสัส",
 	Size = UDim2.fromOffset(580, 460),
 	DragStyle = 2, -- 1: Uses a move icon to drag, ideal for PC. 2: Uses the entire UI to drag, ideal for Mobile.
 	DisabledWindowControls = {},
@@ -38,8 +38,8 @@ local Window = MacLib:Window({
 ]]--
 
 Window:Notify({
-	Title = "Notify",
-	Description = "Desc",
+	Title = "Power by Xin",
+	Description = "Loading script",
 	Lifetime = 5,
 	--[[
 	Scale <number>
@@ -50,146 +50,23 @@ Window:Notify({
 })
 
 Window:Dialog({
-	Title = "aa",
-	Description = "are u gay.",
+	Title = "Discord",
+	Description = "https://discord.gg/NVnd8gED",
 	Buttons = {
 		{
-			Name = "yep",
+			Name = "ok",
 			Callback = function()
 				print("Confirmed!")
 			end,
 		},
 		{
-			Name = "Cancel"
+			Name = "No"
 		}
 	}
 })
 
 local TabGroup = Window:TabGroup()
 local Tab = TabGroup:Tab({
-	Name = "NN",
+	Name = "Main",
 	Image = "127897217937601" -- Image can be at maximum 16 pixels wide and 16 pixels tall.
 })
-local Section = Tab:Section({
-	Side = "Left"
-	--<string: "Left", "Right">
-})
-Section:Button({
-	Name = "Kill All",
-	Callback = function()
-		print("Killed everyone.")
-	end,
-})
---[[
-:UpdateName(<string>)
-:SetVisiblity(<boolean>)
-]]--
-Section:Input({
-	Name = "Target",
-	Placeholder = "Username",
-	AcceptedCharacters = function(input)
-		return input:gsub("[^a-zA-Z0-9]", "") -- AlphaNumeric sub
-	end,
-	Callback = function(input)
-		print("Target set: ".. input)
-	end,
-}, "TargetInput")
-
---Slider
-Section:Slider({
-	Name = "Walkspeed",
-	Default = 16,
-	Minimum = 0,
-	Maximum = 100,
-	DisplayMethod = "Percent",
-	Callback = function(Value)
-		print("Changed to ".. Value)
-	end,
-}, "WalkspeedSlider")
---Togglr
-Section:Toggle({
-	Name = "Flight",
-	Default = false,
-	Callback = function(value)
-		Window:Notify({
-			Title = "Kuzu Hub",
-			Description = (value and "Enabled " or "Disabled ") .. "Flight"
-		})
-	end,
-}, "FlightToggle")
---Keybind
-Section:Keybind({
-	Name = "Reset Inventory",
-	Callback = function(binded)
-		Window:Notify({
-			Title = "Kuzu Hub",
-			Description = "Successfully Reset Inventory",
-			Lifetime = 3
-		})
-	end,
-	onBinded = function(bind)
-		Window:Notify({
-			Title = "Kuzu Hub",
-			Description = "Rebinded Reset Inventory to "..tostring(bind.Name),
-			Lifetime = 3
-		})
-	end,
-}, "ResetInventoryBind")
-
---dropdwon
-Section:Dropdown({
-	Name = "Give Weapons",
-	Search = true,
-	Multi = true,
-	Required = false,
-	Options = {"AK-47", "M4A1", "Desert Eagle", "AWP", "MP5", "SPAS-12"},
-	Default = {"M4A1", "AWP"},
-	Callback = function(Value)
-		local Values = {}
-		for _, State in next, Value do
-			if State then
-				table.insert(Values, _)
-			end
-		end
-		print("Selected Weapons:", table.concat(Values, ", "))
-	end,
-}, "GiveWeaponsDropdown")
-
---[[
-:UpdateName(<string>)
-:SetVisiblity(<boolean>)
-:UpdateSelection(<string or number or table>) -- string/number for single, table for multi
-:InsertOptions(<table>)
-:RemoveOptions(<table>)
-:IsOption(<string>: boolean)
-:GetOptions(: table) -- Returns a table of every option and if it's true or false (Example: {"Option 1" = true, "Option 2" = false, "Option 3" = false} etc..)
-:ClearOptions()
-]]--
-
-Section:Header({
-	Text = "kuy"
-}, nil)
-
-Section:Paragraph({
-	Header = "<string>",
-	Body = "<string>"
-}, nil)
-Section:Label({
-	Text = "S"
-}, nil)
-Section:SubLabel({
-	Text = "Saaa"
-}, nil)
---[[
-:UpdateName(<string>)
-:SetVisiblity(<boolean>)
-]]
-
-
---Line
-Section:Divider()
---[[
-:Remove()
-:SetVisiblity(<boolean>)
-]]
-Section:Spacer()
