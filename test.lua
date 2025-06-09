@@ -17,6 +17,8 @@ local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "airplay" })
 }
 
+local Section = Main:AddSection("สคริปยังเป็นเบต้าอยู่โปรดใช้อย่างระวังบัค หากบัคให้แจ้งไอสัส💢")
+
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
